@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import net.mcjukebox.plugin.bukkit.api.JukeboxAPI;
 import net.mcjukebox.plugin.bukkit.api.ResourceType;
 import net.mcjukebox.plugin.bukkit.api.models.Media;
+import net.mcjukebox.plugin.bukkit.utils.CommandUtils;
 import net.mcjukebox.plugin.bukkit.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 
 @AllArgsConstructor
 public class PlayCommand extends JukeboxCommand {
@@ -36,17 +38,20 @@ public class PlayCommand extends JukeboxCommand {
             toPlay.loadOptions(options);
         }
 
-        if (args[0].startsWith("@")) {
+        List<Player> players = CommandUtils.selectorToPlayer(dispatcher, args[0]);
+        if (!players.isEmpty()) {
+            System.out.println(players.toString());
+            for (Player player: players) {
+                if (player != null) {
+                    JukeboxAPI.play(player, toPlay);
+                }
+            }
+        } else if (args[0].startsWith("@")) {
             JukeboxAPI.getShowManager().getShow(args[0]).play(toPlay);
         } else {
-            Player player = Bukkit.getPlayer(args[0]);
-            if (player != null) {
-                JukeboxAPI.play(player, toPlay);
-            } else {
-                HashMap<String, String> findAndReplace = new HashMap<String, String>();
-                findAndReplace.put("user", args[1]);
-                MessageUtils.sendMessage(dispatcher, "command.notOnline", findAndReplace);
-            }
+            HashMap<String, String> findAndReplace = new HashMap<String, String>();
+            findAndReplace.put("user", args[0]);
+            MessageUtils.sendMessage(dispatcher, "command.notOnline", findAndReplace);
         }
 
         return true;
