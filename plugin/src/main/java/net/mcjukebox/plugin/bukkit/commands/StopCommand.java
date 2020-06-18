@@ -31,13 +31,13 @@ public class StopCommand extends JukeboxCommand {
         String selection = args.length >= 2 ? args[0] : "music";
         int targetIndex = args.length == 1 ? 0 : 1;
 
-        // Stop music in a show
+        // Stop everything in a show
         if (args[targetIndex].startsWith("@") && selection.equalsIgnoreCase("all")) {
             JukeboxAPI.getShowManager().getShow(args[targetIndex]).stopAll(fadeDuration);
             return true;
         }
 
-        // Stop everything in a show
+        // Stop music in a show
         if (args[targetIndex].startsWith("@") && selection.equalsIgnoreCase("music")) {
             JukeboxAPI.getShowManager().getShow(args[targetIndex]).stopMusic(fadeDuration);
             return true;
