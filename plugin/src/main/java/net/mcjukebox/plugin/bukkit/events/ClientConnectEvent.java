@@ -8,8 +8,8 @@ public class ClientConnectEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	@Getter private String username;
-	@Getter private long timestamp;
+	@Getter private final String username;
+	@Getter private final long timestamp;
 
 	public ClientConnectEvent(String username, long timestamp) {
 		super(true);
@@ -18,10 +18,6 @@ public class ClientConnectEvent extends Event {
 	}
 
 	public HandlerList getHandlers() {
-		return handlers;
-	}
-
-	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 

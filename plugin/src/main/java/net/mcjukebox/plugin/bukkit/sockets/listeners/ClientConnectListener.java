@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 public class ClientConnectListener implements Emitter.Listener {
 
 	@Override
@@ -25,7 +27,7 @@ public class ClientConnectListener implements Emitter.Listener {
 		MessageUtils.sendMessage(player, "event.clientConnect");
 
 		ShowManager showManager = MCJukebox.getInstance().getShowManager();
-		if(!showManager.inInShow(player.getUniqueId())) return;
+		if(!showManager.inInShow(Objects.requireNonNull(player).getUniqueId())) return;
 
 		for(Show show : showManager.getShowsByPlayer(player.getUniqueId())) {
 			if(show.getCurrentTrack() != null)

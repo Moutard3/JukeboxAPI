@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.oliverdunk</groupId>
         <artifactId>MCJukebox</artifactId>
-        <version>2.6.7-SNAPSHOT</version>
+        <version>LesFousDuPuy-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -22,45 +22,21 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>enginehub-repo</id>
+            <url>https://maven.enginehub.org/repo/</url>
+            <snapshots>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>com.github.SkriptLang</groupId>
-            <artifactId>Skript</artifactId>
-            <version>2.5-alpha3</version>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-core</artifactId>
+            <version>7.0.2</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.destroystokyo.paper</groupId>
-                    <artifactId>paper-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sk89q.worldguard</groupId>
-                    <artifactId>worldguard-legacy</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.github.marcelo-mason</groupId>
-                    <artifactId>PreciousStones</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.milkbowl.vault</groupId>
-                    <artifactId>Vault</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jdt</groupId>
-                    <artifactId>org.eclipse.jdt.annotation</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.code.findbugs</groupId>
-                    <artifactId>findbugs</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.codemc.worldguardwrapper</groupId>
-            <artifactId>worldguardwrapper</artifactId>
-            <version>1.1.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -131,10 +107,6 @@
                                 <relocation>
                                     <pattern>org.json</pattern>
                                     <shadedPattern>net.mcjukebox.plugin.bukkit.libs.json</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.codemc.worldguardwrapper</pattern>
-                                    <shadedPattern>net.mcjukebox.plugin.bukkit.libs.worldguardwrapper</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

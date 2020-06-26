@@ -16,11 +16,11 @@ import java.util.List;
 
 public class ConnectionListener {
 
-	@Getter private ConnectionFailedListener connectionFailedListener;
-	@Getter private ConnectionSuccessListener connectionSuccessListener;
+	@Getter private final ConnectionFailedListener connectionFailedListener;
+	@Getter private final ConnectionSuccessListener connectionSuccessListener;
 
-	private SocketHandler socketHandler;
-	private HashMap<String, List<JSONObject>> queue = new HashMap<String, List<JSONObject>>();
+	private final SocketHandler socketHandler;
+	private final HashMap<String, List<JSONObject>> queue = new HashMap<>();
 	private boolean noConnectionWarned = false;
 
 	public ConnectionListener(SocketHandler socketHandler) {
@@ -56,7 +56,7 @@ public class ConnectionListener {
 	@AllArgsConstructor
 	public class ConnectionSuccessListener implements Emitter.Listener {
 
-		private DropListener dropListener;
+		private final DropListener dropListener;
 
 		@Override
 		public void call(Object... objects) {

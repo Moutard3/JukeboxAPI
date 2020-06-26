@@ -2,7 +2,7 @@ package net.mcjukebox.plugin.bukkit.sockets;
 
 public class DripTask implements Runnable {
 
-    private SocketHandler socketHandler;
+    private final SocketHandler socketHandler;
 
     public DripTask(SocketHandler socketHandler) {
         this.socketHandler = socketHandler;

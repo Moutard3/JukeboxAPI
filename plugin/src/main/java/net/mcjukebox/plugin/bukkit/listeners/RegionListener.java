@@ -1,5 +1,11 @@
 package net.mcjukebox.plugin.bukkit.listeners;
 
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import net.mcjukebox.plugin.bukkit.MCJukebox;
 import net.mcjukebox.plugin.bukkit.api.JukeboxAPI;
@@ -9,6 +15,9 @@ import net.mcjukebox.plugin.bukkit.managers.RegionManager;
 import net.mcjukebox.plugin.bukkit.managers.shows.Show;
 import net.mcjukebox.plugin.bukkit.managers.shows.ShowManager;
 import org.bukkit.Location;
+import net.mcjukebox.plugin.bukkit.utils.MessageUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,23 +27,60 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
-import org.codemc.worldguardwrapper.WorldGuardWrapper;
-import org.codemc.worldguardwrapper.region.IWrappedRegion;
+import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class RegionListener implements Listener {
 
-    private RegionManager utils;
-    @Getter
-    private HashMap<UUID, String> playerInRegion = new HashMap<>();
+    @AllArgsConstructor
+    @Data
+    public static class Region {
+
+        private String id;
+        private int priority;
+
+    }
+
+    private final RegionManager utils;
+    @Getter private final HashMap<UUID, String> playerInRegion = new HashMap<>();
 
     public RegionListener(RegionManager utils) {
         this.utils = utils;
     }
 
-    private void handleMovement(Player player, Location from, Location to) {
+    private boolean URL(final CommandSender sender) {
+        MessageUtils.sendMessage(sender, "user.openLoading");
+        Bukkit.getScheduler().runTaskAsynchronously(MCJukebox.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                if (!(sender instanceof Player)) return;
+                String token = JukeboxAPI.getToken((Player) sender);
+                MessageUtils.sendURL((Player) sender, token);
+            }
+        });
+        return true;
+    }
+
+    public List<Region> getApplicableRegions(Location location) {
+        ArrayList<Region> regionList = new ArrayList<>();
+
+        WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
+
+        World world = platform.getMatcher().getWorldByName(Objects.requireNonNull(location.getWorld()).getName());
+        com.sk89q.worldguard.protection.managers.RegionManager regionManager = platform.getRegionContainer().get(world);
+        org.bukkit.util.Vector bukkitVector = location.toVector();
+        BlockVector3 vector = BlockVector3.at(bukkitVector.getX(), bukkitVector.getY(), bukkitVector.getZ());
+        Set<ProtectedRegion> regions = Objects.requireNonNull(regionManager).getApplicableRegions(vector).getRegions();
+
+        for (ProtectedRegion region : regions) {
+            regionList.add(new Region(region.getId(), region.getPriority()));
+        }
+
+        return regionList;
+    }
+
+    public void handleMovement(Player player, Location from, Location to) {
         //Only execute if the player moves an entire block
         if (from != null
                 && from.getBlockX() == to.getBlockX()
@@ -43,7 +89,7 @@ public class RegionListener implements Listener {
 
         int highestPriority = -1;
         String highestRegion = null;
-        for (IWrappedRegion region : WorldGuardWrapper.getInstance().getRegions(to)) {
+        for (Region region : getApplicableRegions(to)) {
             if (region.getPriority() > highestPriority && utils.hasRegion(region.getId())) {
                 highestPriority = region.getPriority();
                 highestRegion = region.getId();
@@ -65,17 +111,19 @@ public class RegionListener implements Listener {
                 if (lastShow == null || lastShow.toCharArray()[0] != '@') {
                     //Region no longer exists, stop the music.
                     JukeboxAPI.stopMusic(player);
-                    return;
                 } else {
                     showManager.getShow(lastShow).removeMember(player);
-                    return;
                 }
+                return;
             }
             return;
         }
 
         if (playerInRegion.containsKey(player.getUniqueId()) &&
-                playerInRegion.get(player.getUniqueId()).equals(highestRegion)) return;
+                playerInRegion.get(player.getUniqueId()).equals(highestRegion) &&
+                utils.getURL(playerInRegion.get(player.getUniqueId())).equals(utils.getURL(highestRegion))) {
+            return;
+        }
 
         if (playerInRegion.containsKey(player.getUniqueId()) &&
                 utils.getURL(playerInRegion.get(player.getUniqueId())).equals(utils.getURL(highestRegion))) {
@@ -92,7 +140,9 @@ public class RegionListener implements Listener {
         }
 
         if (utils.getURL(highestRegion).toCharArray()[0] == '@') {
-            if (playerInRegion.containsKey(player.getUniqueId())) JukeboxAPI.stopMusic(player);
+            if (playerInRegion.containsKey(player.getUniqueId())) {
+                JukeboxAPI.stopMusic(player);
+            }
             showManager.getShow(utils.getURL(highestRegion)).addMember(player, true);
             playerInRegion.put(player.getUniqueId(), highestRegion);
             return;
@@ -105,6 +155,7 @@ public class RegionListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
+        URL(event.getPlayer());
         //The from location has to be offset else the event will not be run
         handleMovement(event.getPlayer(), null, event.getPlayer().getLocation());
     }
@@ -119,10 +170,10 @@ public class RegionListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMinecartMove(VehicleMoveEvent event) {
-        if (event.getVehicle().getPassenger() == null || !(event.getVehicle().getPassenger() instanceof Player)) {
+        if (event.getVehicle().getPassengers().size() == 0 || !(event.getVehicle().getPassengers().get(0) instanceof Player)) {
             return;
         }
-        handleMovement((Player) event.getVehicle().getPassenger(), event.getFrom(), event.getTo());
+        handleMovement((Player) event.getVehicle().getPassengers().get(0), event.getFrom(), event.getTo());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

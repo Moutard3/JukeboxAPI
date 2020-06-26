@@ -18,7 +18,7 @@ public class StopCommand extends JukeboxCommand {
         JSONObject options = new JSONObject();
 
         if (args.length >= 3) {
-            options = jsonFromArgs(args, 2);
+            options = jsonFromArgs(args);
 
             if (options == null) {
                 dispatcher.sendMessage(ChatColor.RED + "Unable to parse options as JSON.");

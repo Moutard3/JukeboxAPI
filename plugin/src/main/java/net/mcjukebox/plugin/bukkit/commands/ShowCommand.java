@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class ShowCommand extends JukeboxCommand {
 
@@ -27,10 +28,10 @@ public class ShowCommand extends JukeboxCommand {
 
         switch (args[0]) {
             case "add":
-                show.addMember(target, false);
+                show.addMember(Objects.requireNonNull(target), false);
                 return true;
             case "remove":
-                show.removeMember(target);
+                show.removeMember(Objects.requireNonNull(target));
                 return true;
             default:
                 return false;

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class ShowManager {
 
-	@Getter private HashMap<String, Show> shows = new HashMap<String, Show>();
+	@Getter private final HashMap<String, Show> shows = new HashMap<String, Show>();
 
 	public Show getShow(String name) {
 		name = name.replace("@", "");
@@ -23,7 +23,7 @@ public class ShowManager {
 	}
 
 	public List<Show> getShowsByPlayer(UUID UUID) {
-		ArrayList<Show> inShows = new ArrayList<Show>();
+		ArrayList<Show> inShows = new ArrayList<>();
 		for(Show show : shows.values()) {
 			if(show.getMembers().containsKey(UUID)) inShows.add(show);
 		}
@@ -35,11 +35,6 @@ public class ShowManager {
 			if(show.getMembers().containsKey(UUID)) return true;
 		}
 		return false;
-	}
-
-	public boolean showExists(String name) {
-		name = name.replace("@", "");
-		return shows.containsKey(name);
 	}
 
 }

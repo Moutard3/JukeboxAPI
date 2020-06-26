@@ -11,7 +11,7 @@ import java.io.File;
 
 public class KeyHandler {
 
-	private SocketHandler socketHandler;
+	private final SocketHandler socketHandler;
 	@Getter private CommandSender currentlyTryingKey;
 
 	public KeyHandler(SocketHandler socketHandler) {

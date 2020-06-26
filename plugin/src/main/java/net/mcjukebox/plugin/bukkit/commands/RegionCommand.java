@@ -2,24 +2,60 @@ package net.mcjukebox.plugin.bukkit.commands;
 
 import lombok.AllArgsConstructor;
 import net.mcjukebox.plugin.bukkit.MCJukebox;
+import net.mcjukebox.plugin.bukkit.api.JukeboxAPI;
 import net.mcjukebox.plugin.bukkit.managers.RegionManager;
+import net.mcjukebox.plugin.bukkit.managers.shows.ShowManager;
 import net.mcjukebox.plugin.bukkit.utils.MessageUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class RegionCommand extends JukeboxCommand {
 
     private static final int REGIONS_PER_PAGE = 5;
 
-    private RegionManager regionManager;
+    private final RegionManager regionManager;
 
     @Override
     public boolean execute(CommandSender dispatcher, String[] args) {
         // region add <id> <url>
         if (args.length == 3 && args[0].equalsIgnoreCase("add")){
+            if(MCJukebox.getInstance().getRegionManager().hasRegion(args[1])) {
+                ShowManager showManager = MCJukebox.getInstance().getShowManager();
+                HashMap<UUID, String> playersInRegion = MCJukebox.getInstance().getRegionListener().getPlayerInRegion();
+
+                Iterator<UUID> keys = playersInRegion.keySet().iterator();
+
+                while (keys.hasNext()) {
+                    UUID uuid = keys.next();
+                    String regionID = playersInRegion.get(uuid);
+
+                    if (regionID.equals(args[1])) {
+                        Player player = Bukkit.getPlayer(uuid);
+                        if (player == null) continue;
+
+                        if (MCJukebox.getInstance().getRegionManager().getRegions().get(args[1]).charAt(0) == '@') {
+                            showManager.getShow(MCJukebox.getInstance().getRegionManager().getRegions().get(args[1])).removeMember(player);
+                        } else {
+                            JukeboxAPI.stopMusic(player);
+                        }
+                        keys.remove();
+                    }
+                }
+            }
+
             MCJukebox.getInstance().getRegionManager().addRegion(args[1], args[2]);
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                MCJukebox.getInstance().getRegionListener().handleMovement(player, player.getLocation().subtract(1, 1, 1), player.getLocation());
+            });
+
             MessageUtils.sendMessage(dispatcher, "region.registered");
             return true;
         }
@@ -45,7 +81,7 @@ public class RegionCommand extends JukeboxCommand {
             if (args.length == 2) {
                 try {
                     page = Integer.parseInt(args[1]);
-                } catch (NumberFormatException e) {}
+                } catch (NumberFormatException ignored) {}
                     
                 if (page > pageCount) {
                     return false;

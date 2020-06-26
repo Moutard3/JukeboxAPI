@@ -1,6 +1,5 @@
 package net.mcjukebox.plugin.bukkit;
 
-import net.mcjukebox.plugin.bukkit.managers.skript.SkriptManager;
 import net.mcjukebox.plugin.bukkit.managers.shows.ShowSyncTask;
 import net.mcjukebox.plugin.bukkit.sockets.SocketHandler;
 import net.mcjukebox.plugin.bukkit.commands.JukeboxCommandExecutor;
@@ -15,6 +14,8 @@ import net.mcjukebox.plugin.bukkit.utils.TimeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
+
 public class MCJukebox extends JavaPlugin {
 
     @Getter private static final boolean DEBUG = true;
@@ -23,7 +24,6 @@ public class MCJukebox extends JavaPlugin {
     @Getter private static MCJukebox instance;
     @Getter private SocketHandler socketHandler;
     @Getter private RegionManager regionManager;
-    @Getter private SkriptManager skriptManager;
     @Getter private RegionListener regionListener;
     @Getter private LangManager langManager;
     @Getter private ShowManager showManager;
@@ -33,7 +33,7 @@ public class MCJukebox extends JavaPlugin {
      * Called when the plugin is first loaded by Spigot.
      */
     public void onEnable(){
-        this.instance = this;
+        instance = this;
 
         langManager = new LangManager();
         MessageUtils.setLangManager(langManager);
@@ -53,11 +53,7 @@ public class MCJukebox extends JavaPlugin {
             Bukkit.getPluginManager().registerEvents(regionListener, this);
         }
 
-        if (Bukkit.getPluginManager().getPlugin("Skript") != null) {
-            skriptManager = new SkriptManager();
-        }
-
-        Bukkit.getPluginCommand("jukebox").setExecutor(new JukeboxCommandExecutor(regionManager));
+        Objects.requireNonNull(Bukkit.getPluginCommand("jukebox")).setExecutor(new JukeboxCommandExecutor(regionManager));
         this.getLogger().info(this.getName() + " has been loaded!");
     }
 

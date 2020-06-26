@@ -1,7 +1,6 @@
 package net.mcjukebox.plugin.bukkit.managers;
 
 import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
 import org.json.JSONObject;
 
 import java.util.Iterator;

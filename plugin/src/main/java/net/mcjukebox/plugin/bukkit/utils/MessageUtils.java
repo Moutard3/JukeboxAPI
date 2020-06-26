@@ -46,7 +46,7 @@ public class MessageUtils {
 
 	public static void sendURL(Player player, String token){
 		if(isSpigot()){
-			new SpigotUtils().URL(player, langManager, token);
+			SpigotUtils.URL(player, langManager, token);
 		}else{
 			String URL = langManager.get("user.openDomain") + "?token=" + token;
 			player.sendMessage(ChatColor.GOLD + langManager.get("user.openClient"));

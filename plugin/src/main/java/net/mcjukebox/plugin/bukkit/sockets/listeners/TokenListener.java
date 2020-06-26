@@ -7,8 +7,8 @@ import java.util.*;
 
 public class TokenListener implements Emitter.Listener {
 
-	private Map<String, List<Object>> tokenLocks;
-	private Map<String, String> tokens;
+	private final Map<String, List<Object>> tokenLocks;
+	private final Map<String, String> tokens;
 
 	public TokenListener() {
 		tokenLocks = new HashMap<>();
@@ -31,14 +31,13 @@ public class TokenListener implements Emitter.Listener {
 		}
 
 		tokenLocks.remove(username);
-		return;
 	}
 
 	public void addLock(String username, Object lock) {
 		if (tokenLocks.containsKey(username)) {
 			tokenLocks.get(username).add(lock);
 		} else {
-			ArrayList locks = new ArrayList<Object>();
+			ArrayList<Object> locks = new ArrayList<>();
 			locks.add(lock);
 			tokenLocks.put(username, locks);
 		}

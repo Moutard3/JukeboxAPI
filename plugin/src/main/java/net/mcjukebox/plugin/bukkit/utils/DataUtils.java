@@ -12,7 +12,7 @@ public class DataUtils {
      * @param objectToSave The object which should be saved
      * @param pathToSaveTo The path in which to save the object
      */
-    public static <T extends Object> void saveObjectToPath(T objectToSave, String pathToSaveTo) {
+    public static <T> void saveObjectToPath(T objectToSave, String pathToSaveTo) {
         try {
             File file = new File(pathToSaveTo);
             if(!file.getParentFile().exists()) file.getParentFile().mkdirs();
@@ -32,7 +32,7 @@ public class DataUtils {
      * @param pathToLoadFrom The path in which the object file is located
      * @return An object which has been loaded from the file, or null if the file does not exist
      */
-    public static <T extends Object> T loadObjectFromPath(String pathToLoadFrom) {
+    public static <T> T loadObjectFromPath(String pathToLoadFrom) {
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(pathToLoadFrom));
             T result = (T) ois.readObject();

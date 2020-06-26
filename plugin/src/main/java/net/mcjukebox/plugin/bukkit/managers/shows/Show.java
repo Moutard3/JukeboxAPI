@@ -10,11 +10,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Show {
 
-	@Getter private HashMap<UUID, Boolean> members = new HashMap<UUID, Boolean>();
+	@Getter private final HashMap<UUID, Boolean> members = new HashMap<UUID, Boolean>();
 	@Getter private Media currentTrack;
 	@Getter @Setter private String channel = "default";
 
@@ -41,7 +42,7 @@ public class Show {
 
 		for(UUID UUID : members.keySet()) {
 			if(Bukkit.getPlayer(UUID) == null) continue;
-			JukeboxAPI.play(Bukkit.getPlayer(UUID), media);
+			JukeboxAPI.play(Objects.requireNonNull(Bukkit.getPlayer(UUID)), media);
 		}
 	}
 
@@ -53,7 +54,7 @@ public class Show {
 		if(currentTrack == null) return;
 		for(UUID UUID : members.keySet()) {
 			if(Bukkit.getPlayer(UUID) == null) continue;
-			JukeboxAPI.stopMusic(Bukkit.getPlayer(UUID), channel, fadeDuration);
+			JukeboxAPI.stopMusic(Objects.requireNonNull(Bukkit.getPlayer(UUID)), channel, fadeDuration);
 		}
 		currentTrack = null;
 	}
@@ -65,7 +66,7 @@ public class Show {
 	public void stopAll(int fadeDuration) {
 		for(UUID UUID : members.keySet()) {
 			if(Bukkit.getPlayer(UUID) == null) continue;
-			JukeboxAPI.stopAll(Bukkit.getPlayer(UUID), channel, fadeDuration);
+			JukeboxAPI.stopAll(Objects.requireNonNull(Bukkit.getPlayer(UUID)), channel, fadeDuration);
 		}
 		this.currentTrack = null;
 	}
@@ -77,7 +78,7 @@ public class Show {
 		// Send updated start time to all connected players
 		for(UUID UUID : members.keySet()) {
 			if(Bukkit.getPlayer(UUID) == null) continue;
-			JukeboxAPI.play(Bukkit.getPlayer(UUID), currentTrack);
+			JukeboxAPI.play(Objects.requireNonNull(Bukkit.getPlayer(UUID)), currentTrack);
 		}
 	}
 

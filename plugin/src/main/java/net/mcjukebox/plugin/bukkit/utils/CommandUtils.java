@@ -21,7 +21,7 @@ public class CommandUtils {
                     found.add((Player) entity);
                 }
             }
-        } catch (IllegalArgumentException ex) {}
+        } catch (IllegalArgumentException ignored) {}
 
         return found;
     }

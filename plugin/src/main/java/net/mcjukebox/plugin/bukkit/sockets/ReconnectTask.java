@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class ReconnectTask implements Runnable {
 
-	private SocketHandler socketHandler;
+	private final SocketHandler socketHandler;
 	private long lastReconnectionAttempt = 0;
 	private int reconnectionFailures = 0;
 	@Setter private boolean reconnecting = true;

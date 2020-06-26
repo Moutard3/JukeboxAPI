@@ -13,13 +13,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @AllArgsConstructor
 public abstract class JukeboxCommand {
 
-    private final String SELECTOR_REGEX = "@[ap]\\[r=([0-9]{1,4})\\]";
+    private final String SELECTOR_REGEX = "@[ap]\\[r=([0-9]{1,4})]";
 
     public abstract boolean execute(CommandSender dispatcher, String[] args);
 
@@ -51,9 +52,7 @@ public abstract class JukeboxCommand {
         List<Player> targets = new ArrayList<Player>();
 
         if (selector.toLowerCase().startsWith("@a")) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                targets.add(player);
-            }
+            targets.addAll(Bukkit.getOnlinePlayers());
         }
 
         if (selector.toLowerCase().startsWith("@p")) {
@@ -84,7 +83,7 @@ public abstract class JukeboxCommand {
         double nearestDistance = Double.MAX_VALUE;
         Player nearestPlayer = null;
 
-        for (Entity entity : location.getWorld().getNearbyEntities(location, 1000, 1000, 1000)) {
+        for (Entity entity : Objects.requireNonNull(location.getWorld()).getNearbyEntities(location, 1000, 1000, 1000)) {
             if (entity instanceof Player) {
                 Player candidate = (Player) entity;
                 if (candidate.getLocation().distanceSquared(location) < nearestDistance) {
@@ -107,9 +106,9 @@ public abstract class JukeboxCommand {
         return from.distance(target.getLocation()) <= radius;
     }
 
-    protected JSONObject jsonFromArgs(String[] args, int startPoint) {
+    protected JSONObject jsonFromArgs(String[] args) {
         StringBuilder json = new StringBuilder();
-        for(int i = startPoint; i < args.length; i++) json.append(args[i]);
+        for(int i = 2; i < args.length; i++) json.append(args[i]);
 
         try {
             return new JSONObject(json.toString());

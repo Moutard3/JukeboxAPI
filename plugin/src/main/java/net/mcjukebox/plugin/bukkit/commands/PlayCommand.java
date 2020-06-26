@@ -6,7 +6,6 @@ import net.mcjukebox.plugin.bukkit.api.ResourceType;
 import net.mcjukebox.plugin.bukkit.api.models.Media;
 import net.mcjukebox.plugin.bukkit.utils.CommandUtils;
 import net.mcjukebox.plugin.bukkit.utils.MessageUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -18,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PlayCommand extends JukeboxCommand {
 
-    private ResourceType type;
+    private final ResourceType type;
 
     @Override
     public boolean execute(CommandSender dispatcher, String[] args) {
@@ -28,7 +27,7 @@ public class PlayCommand extends JukeboxCommand {
         Media toPlay = new Media(type, url);
 
         if (args.length >= 3) {
-            JSONObject options = jsonFromArgs(args, 2);
+            JSONObject options = jsonFromArgs(args);
 
             if (options == null) {
                 dispatcher.sendMessage(ChatColor.RED + "Unable to parse options as JSON.");
@@ -40,7 +39,6 @@ public class PlayCommand extends JukeboxCommand {
 
         List<Player> players = CommandUtils.selectorToPlayer(dispatcher, args[0]);
         if (!players.isEmpty()) {
-            System.out.println(players.toString());
             for (Player player: players) {
                 if (player != null) {
                     JukeboxAPI.play(player, toPlay);
@@ -49,7 +47,7 @@ public class PlayCommand extends JukeboxCommand {
         } else if (args[0].startsWith("@")) {
             JukeboxAPI.getShowManager().getShow(args[0]).play(toPlay);
         } else {
-            HashMap<String, String> findAndReplace = new HashMap<String, String>();
+            HashMap<String, String> findAndReplace = new HashMap<>();
             findAndReplace.put("user", args[0]);
             MessageUtils.sendMessage(dispatcher, "command.notOnline", findAndReplace);
         }
